@@ -1,4 +1,4 @@
-# JSMultiLangEmu: JS Multi Language Emulation Prototype
+# JS Multi Language Emulation Prototype
 
 ## Prerequisites
 - Installed nodejs, preferably via nvm
