@@ -1,0 +1,17 @@
+
+
+#ui
+	header
+		+header-height($header-height)
+		padding: 0px 10px
+		display: block
+		position: fixed
+		top: 0px
+		left: 0px
+		width: 100%
+		> *
+			+header-height($header-height)
+			height: auto
+			max-height: $header-height
+			margin: 0px 10px
+	@import 'codebin'
