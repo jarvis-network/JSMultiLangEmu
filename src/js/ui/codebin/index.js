@@ -4,12 +4,83 @@
 const Rx = require('rx');
 const $ = Rx.Observable;
 
+const {str} = require('iblokz-data');
+
 const prettify = require('code-prettify');
 const vm = require('../../util/vm');
 
 // Python
-const Sk = require('../../util/sk');
-// const Sk = require('skulpt');
+let Sk = require('../../util/sk');
+// let Sk = require('skulpt');
+// Sk = require('../../util/skulpt-stdin-node')(Sk);
+// skulpt experiment
+/*
+Sk.builtinFiles.files[`src/lib/testlib1/__init__.js`] = `
+var $builtinmodule = function(name)
+{
+	var mod = {};
+
+	Sk.testlib1 = {};
+
+	mod.test_func = new Sk.builtin.func(function(test_arg) {
+		console.log({test_arg});
+	});
+
+	return mod;
+}
+`;
+*/
+const skulptExtensions = {
+	domClear: elQuery => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = body.querySelector(elQuery.v);
+		el.innerHTML = '';
+	},
+	domCreate: (tagName, id, parentQuery) => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = document.createElement(tagName.v);
+		el.setAttribute('id', id.v);
+		body.querySelector(parentQuery.v).appendChild(el);
+	},
+	domSet: (elQuery, prop, value) => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = body.querySelector(elQuery.v);
+		el[prop.v] = value.v;
+	},
+	domGet: (elQuery, prop, value) => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = body.querySelector(elQuery.v);
+		return el[prop.v];
+	},
+	domAttr: (elQuery, attr, value) => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = body.querySelector(elQuery.v);
+		console.log(value);
+		if (value && value.v !== undefined) {
+			el.setAttribute(attr.v, value.v);
+		} else {
+			return el.getAttribute(attr.v);
+		}
+	},
+	domOn: (elQuery, evName, callback) => {
+		const body = document.querySelector('.output > iframe').contentWindow.document;
+		const el = body.querySelector(elQuery.v);
+		el.addEventListener(evName.v, ev => callback.tp$call(ev));
+		console.log(callback);
+	}
+};
+
+Object.keys(skulptExtensions)
+	.forEach(ext => {
+		const pyExt = str.fromCamelCase(ext, '_');
+		Sk.builtin[pyExt] = skulptExtensions[ext];
+		Sk.builtins[pyExt] = Sk.builtin[pyExt];
+	});
+
+// Sk.builtin['test_func'] = function(test_arg) {
+// 	console.log({test_arg});
+// };
+// Sk.builtins['test_func'] = Sk.builtin['test_func'];
 
 // components
 const vdom = require('iblokz-snabbdom-helpers');
@@ -97,6 +168,13 @@ const sandbox = (source, iframe, context = {}, cb) => {
 	cb({res, log, err});
 };
 
+const cleanup = code => code
+	.split('\n')
+	.map(s => s.trimRight())
+	.map(s => s.replace(new RegExp('&nbps;', 'ig'), ''))
+	.filter(s => s !== '' && s !== ' ')
+	.join('\n');
+
 const removeChildren = (el, selector = '*') => Array.from(el.querySelectorAll(selector)).forEach(child => {
 	el.removeChild(child);
 });
@@ -112,7 +190,8 @@ const createBefore = (type, el) => {
 module.exports = ({source, type}) => span('.codebin', [
 	code(`.source[type="${type}"][contenteditable="true"][spellcheck="false"]`, {
 		props: {
-			innerHTML: prettify.prettyPrintOne(source, type, true)
+			innerHTML: prettify.prettyPrintOne(source, type, true),
+			spellcheck: false
 		},
 		on: {
 			focus: ({target}) => [$.fromEvent(target, 'input')
@@ -142,7 +221,8 @@ module.exports = ({source, type}) => span('.codebin', [
 							});
 						}
 						if (type === 'py') {
-							const sourceCode = unprettify(el.innerHTML);
+							const sourceCode = cleanup(unprettify(el.innerHTML));
+							console.log(sourceCode);
 							removeChildren(el.parentNode.querySelector('.output'), 'iframe');
 							let iframe = createBefore('IFRAME', el.parentNode.querySelector('.console'));
 							iframe.contentWindow.document.body.innerHTML = '<style>* {font-size: 24px;}</style><section id="ui"></section>';
@@ -156,7 +236,7 @@ module.exports = ({source, type}) => span('.codebin', [
 							console.log(sourceCode);
 							let module;
 							if (sourceCode.trim() !== '') try {
-								module = Sk.importMainWithBody('repl', false, sourceCode);
+								module = Sk.importMainWithBody('<stdin>', false, sourceCode, true);
 							} catch (err) {
 								console.log(err);
 								el.parentNode.querySelector('.console').innerHTML += `<p class="err">${
