@@ -85,6 +85,9 @@ Object.keys(skulptExtensions)
 // };
 // Sk.builtins['test_func'] = Sk.builtin['test_func'];
 
+// Java
+const javaconves6func = require('esjava');
+
 // components
 const vdom = require('iblokz-snabbdom-helpers');
 const {section, button, span, code, h} = vdom;
@@ -157,6 +160,33 @@ const process = (type, sourceCode, iframe) => {
 	const console$ = new Rx.ReplaySubject();
 	if (type === 'js') {
 		sandbox(sourceCode, iframe, {}, ({res, log, err}) => {
+			if (err) console$.onNext(`<p class="err">${err}</p>\n`);
+			if (log) log.map(l => prettify.prettyPrintOne(JSON.stringify(l)))
+				.forEach(l => console$.onNext(`${l}\n`));
+		});
+	}
+	if (type === 'java') {
+		let jsSourceCode;
+		try {
+			jsSourceCode = javaconves6func(sourceCode);
+		} catch (err) {
+			console.log(err);
+			console$.onNext(`<p class="err">${
+				typeof err === 'string'
+					? err
+					: err.message || JSON.stringify(err, false, 2)
+			}</p>`);
+		}
+		// let ts = transformSync(jsSourceCode);
+		// console.log(ts);
+		jsSourceCode += '\ntypeof HelloWorldExample !== "undefined" && HelloWorldExample.main && HelloWorldExample.main(1);';
+		sandbox(jsSourceCode, iframe, {
+			System: {
+				out: {
+					println: (...args) => console$.onNext(`${args}\n`)
+				}
+			}
+		}, ({res, log, err}) => {
 			if (err) console$.onNext(`<p class="err">${err}</p>\n`);
 			if (log) log.map(l => prettify.prettyPrintOne(JSON.stringify(l)))
 				.forEach(l => console$.onNext(`${l}\n`));

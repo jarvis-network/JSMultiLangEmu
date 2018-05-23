@@ -19,9 +19,11 @@
   "author": "Alex Milanov <alex@i4web.biz>",
   "license": "MIT",
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.47",
     "bourbon": "^4.2.7",
     "bourbon-neat": "^1.8.0",
     "code-prettify": "github:alex-milanov/code-prettify",
+    "esjava": "0.0.8",
     "font-awesome": "^4.7.0",
     "iblokz-data": "^1.2.0",
     "iblokz-snabbdom-helpers": "^1.2.0",

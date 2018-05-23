@@ -27,6 +27,14 @@ dom_set('#b1', 'innerHTML', 'click me')
 dom_on('#b1', 'click', callback)
 */
 
+/*
+public class HelloWorldExample {
+  public static void main(String args[]){
+    System.out.println("Hello World!");
+  }
+}
+*/
+
 // actions
 const set = (key, value) => state => obj.patch(state, key, value);
 const toggle = key => state => obj.patch(state, key, !obj.sub(state, key));
