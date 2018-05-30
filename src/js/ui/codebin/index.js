@@ -4,20 +4,30 @@
 const Rx = require('rx');
 const $ = Rx.Observable;
 
-const {str} = require('iblokz-data');
+const {str, obj} = require('iblokz-data');
 
 const prettify = require('code-prettify');
 const vm = require('../../util/vm');
 const caret = require('../../util/caret');
 
+const libs = require('../../libs');
+
 // Python
-let Sk = require('../../util/sk');
-// let Sk = require('skulpt');
+// let Sk = require('../../util/sk');
+let Sk = require('skulpt');
 // let Sk = require('skulptjs');
 // window.Sk = Sk;
 // Sk = require('../../util/skulpt-stdin-node')(Sk);
 // skulpt experiment
-/*
+
+console.log(Sk.builtinFiles);
+function builtinRead(x)
+{
+    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+        throw "File not found: '" + x + "'";
+    return Sk.builtinFiles["files"][x];
+}
+
 Sk.builtinFiles.files[`src/lib/testlib1/__init__.js`] = `
 var $builtinmodule = function(name)
 {
@@ -32,7 +42,7 @@ var $builtinmodule = function(name)
 	return mod;
 }
 `;
-*/
+
 const skulptExtensions = {
 	domClear: elQuery => {
 		const body = document.querySelector('.output > iframe').contentWindow.document;
@@ -73,11 +83,35 @@ const skulptExtensions = {
 	}
 };
 
-Object.keys(skulptExtensions)
-	.forEach(ext => {
-		const pyExt = str.fromCamelCase(ext, '_');
-		Sk.builtin[pyExt] = skulptExtensions[ext];
-		Sk.builtins[pyExt] = Sk.builtin[pyExt];
+// Object.keys(skulptExtensions)
+// 	.forEach(ext => {
+// 		const pyExt = str.fromCamelCase(ext, '_');
+// 		Sk.builtin[pyExt] = skulptExtensions[ext];
+// 		Sk.builtins[pyExt] = Sk.builtin[pyExt];
+// 	});
+
+// load libs
+Object.keys(libs)
+	.forEach(lib => {
+		// const sklib = obj.map(libs[lib], (key, func) => new Sk.builtin.func(func));
+		// console.log(sklib);
+		// const pyExt = str.fromCamelCase(ext, '_');
+		// Sk.builtin[lib] = sklib;
+		// Sk.builtins[lib] = Sk.builtin[lib];
+		Sk.builtinFiles.files[`src/lib/${lib}/__init__.js`] = `
+		var $builtinmodule = function(name)
+		{
+			var mod = {};
+
+			Sk.${lib} = {};
+` +
+			Object.keys(libs[lib]).map(func => `
+			mod.${func} = ${libs[lib][func].toString()}
+`) + `
+
+			return mod;
+		}
+		`;
 	});
 
 // Sk.builtin['test_func'] = function(test_arg) {
@@ -159,7 +193,7 @@ const prepOutput = parentNode => {
 const process = (type, sourceCode, iframe) => {
 	const console$ = new Rx.ReplaySubject();
 	if (type === 'js') {
-		sandbox(sourceCode, iframe, {}, ({res, log, err}) => {
+		sandbox(sourceCode, iframe, libs, ({res, log, err}) => {
 			if (err) console$.onNext(`<p class="err">${err}</p>\n`);
 			if (log) log.map(l => prettify.prettyPrintOne(JSON.stringify(l)))
 				.forEach(l => console$.onNext(`${l}\n`));
@@ -193,10 +227,13 @@ const process = (type, sourceCode, iframe) => {
 		});
 	}
 	if (type === 'py') {
-		Sk.configure({output: text => {
-			console.log(text);
-			console$.onNext(`${text}`);
-		}});
+		Sk.configure({
+			output: text => {
+				console.log(text);
+				console$.onNext(`${text}`);
+			},
+			read: builtinRead
+		});
 
 		let module;
 		if (sourceCode.trim() !== '') try {
