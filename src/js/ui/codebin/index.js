@@ -314,6 +314,18 @@ module.exports = ({source, type}) => span('.codebin', [
 							console.log(l);
 							elm.innerHTML += l;
 						});
+				},
+				update: ({elm}) => {
+					// clear and prep output and console
+					let iframe = prepOutput(elm.parentNode);
+
+					// process code
+					process(type, cleanupCode(source), iframe)
+						.catch(err => console.log(err))
+						.subscribe(l => {
+							console.log(l);
+							elm.innerHTML += l;
+						});
 				}
 			}
 		})
