@@ -35,6 +35,61 @@ dom.create('button', 'b1', '#ui')
 dom.set('#b1', 'innerHTML', 'click me')
 dom.on('#b1', 'click', callback)
 `
+			},
+			api: {
+				title: 'APIExample',
+				source: `
+import api
+import dom
+
+url = 'http://quotesondesign.com/wp-json/posts' \\
+	+ '?filter[orderby]=rand&filter[posts_per_page]=1'
+
+def api_cb(res):
+	dom.set('#q', 'innerHTML', res[0]['content'] + '<br/> - ' + res[0]['title'])
+
+def btn_click():
+	api.get(url, api_cb)
+
+def init():
+	dom.clear('#ui')
+	dom.create('button', 'b1', '#ui')
+	dom.create('div', 'q', '#ui')
+	dom.set('#b1', 'innerHTML', 'get quote')
+	dom.on('#b1', 'click', btn_click)
+
+init()
+	`
+			},
+			chart: {
+				title: 'ChartExample',
+				source: `
+import chart
+import dom
+
+option = {
+	'xAxis': {
+		'type': 'category',
+		'data': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+	},
+	'yAxis':{
+		'type': 'value'
+	},
+	'series': [{
+		'data': [820, 932, 901, 934, 1290, 1330, 1320],
+		'type': 'line'
+	}]
+}
+
+def init():
+	dom.clear('#ui')
+	dom.create('canvas', 'my-chart', '#ui')
+	dom.attr('#my-chart', 'width', 500)
+	dom.attr('#my-chart', 'height', 300)
+	chart.draw('#my-chart', option)
+
+init()
+	`
 			}
 		},
 		java: {

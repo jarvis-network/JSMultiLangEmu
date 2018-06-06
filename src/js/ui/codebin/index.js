@@ -21,12 +21,6 @@ let Sk = require('skulpt');
 // skulpt experiment
 
 console.log(Sk.builtinFiles);
-function builtinRead(x)
-{
-    if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
-        throw "File not found: '" + x + "'";
-    return Sk.builtinFiles["files"][x];
-}
 
 Sk.builtinFiles.files[`src/lib/testlib1/__init__.js`] = `
 var $builtinmodule = function(name)
@@ -113,6 +107,12 @@ Object.keys(libs)
 		}
 		`;
 	});
+
+const throwError = msg => {
+	throw new Error(msg);
+};
+
+const builtinRead = x => obj.sub(Sk, ['builtinFiles', 'files', x]) || throwError(`File not found: '${x}'`);
 
 // Sk.builtin['test_func'] = function(test_arg) {
 // 	console.log({test_arg});

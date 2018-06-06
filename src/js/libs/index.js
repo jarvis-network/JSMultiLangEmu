@@ -1,3 +1,5 @@
 module.exports = {
-	dom: require('./dom')
+	dom: require('./dom'),
+	api: require('./api'),
+	chart: require('./chart')
 };
