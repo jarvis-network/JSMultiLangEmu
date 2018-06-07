@@ -46,7 +46,8 @@ url = 'http://quotesondesign.com/wp-json/posts' \\
 	+ '?filter[orderby]=rand&filter[posts_per_page]=1'
 
 def api_cb(res):
-	dom.set('#q', 'innerHTML', res[0]['content'] + '<br/> - ' + res[0]['title'])
+	dom.set('#q', 'innerHTML', res[0]['content'] \\
+	+ ' - ' + res[0]['title'])
 
 def btn_click():
 	api.get(url, api_cb)
@@ -90,6 +91,18 @@ def init():
 
 init()
 	`
+			},
+			procloop: {
+				title: 'ProcLoop',
+				source: `
+import proc
+
+def print_msg ( index ):
+	print 'index is:', index
+
+proc.loop(10, 1, print_msg)
+
+`
 			}
 		},
 		java: {

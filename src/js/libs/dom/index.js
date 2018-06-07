@@ -1,5 +1,7 @@
 'use strict';
 
+const Sk = require('skulpt');
+
 const clear = elQuery => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
 	const el = body.querySelector(elQuery.v);
@@ -39,7 +41,7 @@ const attr = (elQuery, attr, value) => {
 const on = (elQuery, evName, callback) => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
 	const el = body.querySelector(elQuery.v);
-	el.addEventListener(evName.v, ev => callback.tp$call(ev));
+	el.addEventListener(evName.v, ev => callback.tp$call([Sk.ffi.remapToPy(ev)]));
 	console.log(callback);
 };
 

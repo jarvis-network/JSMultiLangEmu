@@ -1,5 +1,6 @@
 'use strict';
 
+const Sk = require('skulpt');
 // const request = require('superagent');
 
 const get = (url, callback) =>

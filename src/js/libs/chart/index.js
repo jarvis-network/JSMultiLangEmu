@@ -1,5 +1,6 @@
 'use strict';
 
+const Sk = require('skulpt');
 const echarts = require('echarts');
 window.echarts = echarts;
 
