@@ -2545,6 +2545,7 @@ body {
     height: 100%;
     width: 50%;
     float: left;
+    overflow-y: auto;
     color: #3e434c;
     tab-size: 2;
     transition: box-shadow .3s;

@@ -41,7 +41,14 @@ const attr = (elQuery, attr, value) => {
 const on = (elQuery, evName, callback) => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
 	const el = body.querySelector(elQuery.v);
-	el.addEventListener(evName.v, ev => callback.tp$call([Sk.ffi.remapToPy(ev)]));
+	el.addEventListener(evName.v, ev => callback.tp$call());
+	console.log(callback);
+};
+
+const off = (elQuery, evName, callback) => {
+	const body = document.querySelector('.output > iframe').contentWindow.document;
+	const el = body.querySelector(elQuery.v);
+	el.removeEventListener(evName.v, ev => callback.tp$call());
 	console.log(callback);
 };
 
@@ -51,5 +58,6 @@ module.exports = {
 	set,
 	get,
 	attr,
-	on
+	on,
+	off
 };

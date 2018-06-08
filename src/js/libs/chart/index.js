@@ -10,6 +10,8 @@ const draw = (elQuery, option) => {
 	console.log(Sk.ffi.remapToJs(option));
 	let myChart = echarts.init(canvas);
 	myChart.setOption(Sk.ffi.remapToJs(option));
+	let update = option => myChart.setOption(Sk.ffi.remapToJs(option));
+	return update;
 };
 
 module.exports = {

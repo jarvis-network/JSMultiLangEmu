@@ -92,6 +92,94 @@ def init():
 init()
 	`
 			},
+			charttimed: {
+				title: 'ChartTimedExample',
+				source: `
+from datetime import datetime
+import chart
+import proc
+import dom
+import random
+
+def shift(seq, n):
+  n = n % len(seq)
+  return seq[n:] + seq[:n]
+
+def genData(max = 2000):
+	value = round(random.uniform(100, max), 2)
+	d = datetime.now()
+	fdate = str(d.year) + '/' + str(d.month) + '/' + str(d.day) \\
+		+ ' ' + str(d.hour) + ':' \\
+		+ (d.minute < 10 if '0' else '') + str(d.minute) \\
+		+ ':' + ('0' if d.second < 10 else '') + str(d. second)
+	print fdate, value
+	res = {
+		'name': str(d),
+		'value': [fdate, value]
+	}
+	return res
+
+#data = map(prepData, [820, 932, 901, 934, 1290, 1330, 1320])
+data = [genData(300)]
+
+option = {
+	'xAxis': {
+    'type': 'time',
+    'splitLine': {
+        'show': False
+    }
+	},
+	'yAxis':{
+		'type': 'value'
+	},
+	'series': [{
+		'data': data,
+		'type': 'line'
+	}]
+}
+
+ready_to_buy = False
+
+def init():
+	dom.clear('#ui')
+
+	# button
+	dom.create('button', 'b1', '#ui')
+	dom.set('#b1', 'innerHTML', 'Start simulation')
+	dom.create('br', 'br1', '#ui')
+
+	dom.create('canvas', 'my-chart', '#ui')
+	dom.attr('#my-chart', 'width', 500)
+	dom.attr('#my-chart', 'height', 300)
+	return chart.draw('#my-chart', option)
+
+update = init()
+
+def loop_fun( index ):
+	# shift(data, 1)
+	item = genData(index * 300)
+	data.append(item)
+	update({
+		'series': [{
+			'data': data,
+			'type': 'line'
+		}]
+	})
+	if item['value'][1] > 1500:
+		ready_to_buy = True
+		def item_bought():
+			print 'item bought'
+		dom.set('#b1', 'innerHTML', 'Buy now')
+		dom.on('#b1', 'click', item_bought)
+
+def start_sim ():
+	proc.loop(10, 1, loop_fun)
+
+
+dom.on('#b1', 'click', start_sim)
+
+	`
+			},
 			procloop: {
 				title: 'ProcLoop',
 				source: `
