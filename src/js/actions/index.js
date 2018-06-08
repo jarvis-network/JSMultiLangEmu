@@ -110,7 +110,7 @@ def genData(max = 2000):
 	d = datetime.now()
 	fdate = str(d.year) + '/' + str(d.month) + '/' + str(d.day) \\
 		+ ' ' + str(d.hour) + ':' \\
-		+ (d.minute < 10 if '0' else '') + str(d.minute) \\
+		+ ('0' if d.minute < 10 else '') + str(d.minute) \\
 		+ ':' + ('0' if d.second < 10 else '') + str(d. second)
 	print fdate, value
 	res = {
