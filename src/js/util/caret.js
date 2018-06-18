@@ -20,31 +20,44 @@ const getRangePoint = (el, offset) =>
 
 const get = el => {
 	let range = window.getSelection().getRangeAt(0);
-	let parentLi = (range.startContainer.tagName === 'LI')
+	// start
+	let startLi = (range.startContainer.tagName === 'LI')
 		? range.startContainer : getParent(range.startContainer, 'LI');
-	let colRange = document.createRange();
-	colRange.setStart(parentLi, 0);
-	colRange.setEnd(range.startContainer, range.startOffset);
-	const row = getElIndex(parentLi);
-	const col = colRange.toString().length;
+	let startColRange = document.createRange();
+	startColRange.setStart(startLi, 0);
+	startColRange.setEnd(range.startContainer, range.startOffset);
+	// end
+	let endLi = (range.endContainer.tagName === 'LI')
+		? range.endContainer : getParent(range.endContainer, 'LI');
+	let endColRange = document.createRange();
+	endColRange.setStart(endLi, 0);
+	endColRange.setEnd(range.endContainer, range.endOffset);
 	return {
-		row,
-		col
+		start: {
+			row: getElIndex(startLi),
+			col: startColRange.toString().length
+		},
+		end: {
+			row: getElIndex(endLi),
+			col: endColRange.toString().length
+		}
 	};
 };
 
 const set = (el, pos) => {
-	const parentLi = Array.from(el.querySelectorAll('li'))[pos.row];
-	const rp = getRangePoint(parentLi, pos.col);
-	console.log(rp);
+	const startLi = Array.from(el.querySelectorAll('li'))[pos.start.row];
+	const endLi = Array.from(el.querySelectorAll('li'))[pos.end.row];
+	const startRp = getRangePoint(startLi, pos.start.col);
+	const endRp = getRangePoint(endLi, pos.end.col);
+	// console.log(rp);
 	let range = document.createRange();
 	try {
-		range.setStart(rp.el, rp.offset);
-		range.setEnd(rp.el, rp.offset);
+		range.setStart(startRp.el, startRp.offset);
+		range.setEnd(endRp.el, endRp.offset);
 	} catch (e) {
 		console.log(e);
-		range.setStart(rp.el, 0);
-		range.setEnd(rp.el, 0);
+		range.setStart(startRp.el, 0);
+		range.setEnd(endRp.el, 0);
 	}
 	const sel = window.getSelection();
 	sel.removeAllRanges();

@@ -222,6 +222,7 @@ module.exports = ({source, type}) => span('.codebin', [
 				if (ev.key === 'Tab') {
 					ev.preventDefault();
 					caret.indent(ev.target, ev.shiftKey === true ? 'left' : 'right');
+					ev.target.dispatchEvent(new Event('input'));
 					// document.execCommand('insertHTML', false, '&#009');
 					// document.execCommand('indent');
 				}
