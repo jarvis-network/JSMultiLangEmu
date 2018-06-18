@@ -106,12 +106,12 @@ def shift(seq, n):
   return seq[n:] + seq[:n]
 
 def genData(max = 2000):
-	value = round(random.uniform(100, max), 2)
+	value = round(random.uniform(0 if max - 200 < 0 else max - 200, max + 200), 2)
 	d = datetime.now()
 	fdate = str(d.year) + '/' + str(d.month) + '/' + str(d.day) \\
 		+ ' ' + str(d.hour) + ':' \\
 		+ ('0' if d.minute < 10 else '') + str(d.minute) \\
-		+ ':' + ('0' if d.second < 10 else '') + str(d. second)
+		+ ':' + ('0' if d.second < 10 else '') + str(d.second)
 	print fdate, value
 	res = {
 		'name': str(d),
@@ -157,7 +157,7 @@ update = init()
 
 def loop_fun( index ):
 	# shift(data, 1)
-	item = genData(index * 300)
+	item = genData((data[len(data) - 1]['value'][1] * 12 + index * 600 + random.uniform(-index * 150, index * 150)) / 15)
 	data.append(item)
 	update({
 		'series': [{
@@ -173,7 +173,7 @@ def loop_fun( index ):
 		dom.on('#b1', 'click', item_bought)
 
 def start_sim ():
-	proc.loop(10, 1, loop_fun)
+	proc.loop(30, 1, loop_fun)
 
 
 dom.on('#b1', 'click', start_sim)

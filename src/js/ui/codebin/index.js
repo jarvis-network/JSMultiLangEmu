@@ -37,46 +37,6 @@ var $builtinmodule = function(name)
 }
 `;
 
-const skulptExtensions = {
-	domClear: elQuery => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = body.querySelector(elQuery.v);
-		el.innerHTML = '';
-	},
-	domCreate: (tagName, id, parentQuery) => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = document.createElement(tagName.v);
-		el.setAttribute('id', id.v);
-		body.querySelector(parentQuery.v).appendChild(el);
-	},
-	domSet: (elQuery, prop, value) => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = body.querySelector(elQuery.v);
-		el[prop.v] = value.v;
-	},
-	domGet: (elQuery, prop, value) => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = body.querySelector(elQuery.v);
-		return el[prop.v];
-	},
-	domAttr: (elQuery, attr, value) => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = body.querySelector(elQuery.v);
-		console.log(value);
-		if (value && value.v !== undefined) {
-			el.setAttribute(attr.v, value.v);
-		} else {
-			return el.getAttribute(attr.v);
-		}
-	},
-	domOn: (elQuery, evName, callback) => {
-		const body = document.querySelector('.output > iframe').contentWindow.document;
-		const el = body.querySelector(elQuery.v);
-		el.addEventListener(evName.v, ev => callback.tp$call(ev));
-		console.log(callback);
-	}
-};
-
 // Object.keys(skulptExtensions)
 // 	.forEach(ext => {
 // 		const pyExt = str.fromCamelCase(ext, '_');
@@ -258,6 +218,14 @@ module.exports = ({source, type}) => span('.codebin', [
 			spellcheck: false
 		},
 		on: {
+			keydown: ev => {
+				if (ev.key === 'Tab') {
+					ev.preventDefault();
+					caret.indent(ev.target, ev.shiftKey === true ? 'left' : 'right');
+					// document.execCommand('insertHTML', false, '&#009');
+					// document.execCommand('indent');
+				}
+			},
 			focus: ({target}) => [$.fromEvent(target, 'input')
 				.map(ev => ev.target)
 				.takeUntil($.fromEvent(target, 'blur'))

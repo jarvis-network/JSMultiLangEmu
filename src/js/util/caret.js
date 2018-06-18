@@ -51,7 +51,35 @@ const set = (el, pos) => {
 	sel.addRange(range);
 };
 
+const indent = (el, direction = 'right') => {
+	let range = window.getSelection().getRangeAt(0);
+	let startLi = (range.startContainer.tagName === 'LI')
+		? range.startContainer : getParent(range.startContainer, 'LI');
+	let startIndex = getElIndex(startLi);
+	let endLi = (range.endContainer.tagName === 'LI')
+		? range.endContainer : getParent(range.endContainer, 'LI');
+	let endIndex = getElIndex(endLi);
+	if (startIndex === endIndex && direction === 'right') {
+		document.execCommand('insertHTML', false, '&#009');
+	} else {
+		Array.from(startLi.parentNode.children)
+			.filter((li, i) => i >= startIndex && i <= endIndex)
+			.forEach(li => {
+				if (direction === 'right') {
+					let tabSpan = document.createElement('span');
+					tabSpan.innerHTML = '\t';
+					li.prepend(tabSpan);
+				} else {
+					console.log(`>${li.children[0].innerHTML}<`);
+					Array.from(li.children).forEach(spEl => spEl.innerHTML === '' && spEl.remove());
+					li.children[0].innerHTML = li.children[0].innerHTML.replace(/^\t/, '');
+				}
+			});
+	}
+};
+
 module.exports = {
 	get,
-	set
+	set,
+	indent
 };
