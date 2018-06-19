@@ -4,7 +4,7 @@ const {obj} = require('iblokz-data');
 
 // dom
 const {
-	h1, a, div, label,
+	h1, a, div, label, img,
 	section, button, span,
 	select, option, header
 } = require('iblokz-snabbdom-helpers');
@@ -18,7 +18,8 @@ const langTypes = {
 };
 
 module.exports = ({state, actions}) => header([
-	h1('JSMultiLangEmu'),
+	img(`[src='assets/logo.jpg']`),
+	h1('codeBin'),
 	label('Lang: '),
 	dropdown('#change-lang', langTypes, state.type, ev => actions.changeLanguage(ev.target.value)),
 	label('Examples: '),
