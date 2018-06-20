@@ -9,6 +9,7 @@ const {str, obj} = require('iblokz-data');
 const prettify = require('code-prettify');
 const vm = require('../../util/vm');
 const caret = require('../../util/caret');
+const pyMod = require('../../util/lang/pymod');
 
 const libs = require('../../libs');
 
@@ -22,20 +23,7 @@ let Sk = require('skulpt');
 
 console.log(Sk.builtinFiles);
 
-Sk.builtinFiles.files[`src/lib/testlib1/__init__.js`] = `
-var $builtinmodule = function(name)
-{
-	var mod = {};
-
-	Sk.testlib1 = {};
-
-	mod.test_func = new Sk.builtin.func(function(test_arg) {
-		console.log({test_arg});
-	});
-
-	return mod;
-}
-`;
+pyMod
 
 // Object.keys(skulptExtensions)
 // 	.forEach(ext => {
@@ -44,29 +32,9 @@ var $builtinmodule = function(name)
 // 		Sk.builtins[pyExt] = Sk.builtin[pyExt];
 // 	});
 
-// load libs
+// build libs as Sk modules
 Object.keys(libs)
-	.forEach(lib => {
-		// const sklib = obj.map(libs[lib], (key, func) => new Sk.builtin.func(func));
-		// console.log(sklib);
-		// const pyExt = str.fromCamelCase(ext, '_');
-		// Sk.builtin[lib] = sklib;
-		// Sk.builtins[lib] = Sk.builtin[lib];
-		Sk.builtinFiles.files[`src/lib/${lib}/__init__.js`] = `
-		var $builtinmodule = function(name)
-		{
-			var mod = {};
-
-			Sk.${lib} = {};
-` +
-			Object.keys(libs[lib]).map(func => `
-			mod.${func} = ${libs[lib][func].toString()}
-`) + `
-
-			return mod;
-		}
-		`;
-	});
+	.forEach(name => pyMod.build(Sk, name, libs[name]));
 
 const throwError = msg => {
 	throw new Error(msg);

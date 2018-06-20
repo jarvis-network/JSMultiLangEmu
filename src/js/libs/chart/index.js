@@ -6,11 +6,14 @@ window.echarts = echarts;
 
 const draw = (elQuery, option) => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
-	const canvas = body.querySelector(elQuery.v);
-	console.log(Sk.ffi.remapToJs(option));
+	const canvas = body.querySelector(elQuery);
+	// console.log(Sk.ffi.remapToJs(option));
 	let myChart = echarts.init(canvas);
-	myChart.setOption(Sk.ffi.remapToJs(option));
-	let update = option => myChart.setOption(Sk.ffi.remapToJs(option));
+	myChart.setOption(option);
+	let update = option => {
+		console.log(option);
+		myChart.setOption(option);
+	};
 	return update;
 };
 

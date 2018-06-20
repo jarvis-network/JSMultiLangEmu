@@ -42,7 +42,7 @@ dom.on('#b1', 'click', callback)
 import api
 import dom
 
-url = 'http://quotesondesign.com/wp-json/posts' \\
+url = '//quotesondesign.com/wp-json/posts' \\
 	+ '?filter[orderby]=rand&filter[posts_per_page]=1'
 
 def api_cb(res):
@@ -140,23 +140,39 @@ option = {
 
 ready_to_buy = False
 
-def init():
+def prep_ui():
 	dom.clear('#ui')
-
-	# button
+	# price value
+	dom.create('label', 'l1', '#ui')
+	dom.set('#l1', 'innerHTML', 'Buy price:')
+	dom.create('input', 'i1', '#ui')
+	dom.attr('#i1', 'type', 'number')
+	dom.set('#i1', 'value', 1500)
+	# start sim
 	dom.create('button', 'b1', '#ui')
 	dom.set('#b1', 'innerHTML', 'Start simulation')
+	# buy now
+	dom.create('button', 'b2', '#ui')
+	dom.set('#b2', 'innerHTML', 'Buy now')
+	# dom.attr('style', 'display: none')
+	dom.attr('#b2', 'disabled', 'true')
+	# line break
 	dom.create('br', 'br1', '#ui')
 
+
+def init_chart():
 	dom.create('canvas', 'my-chart', '#ui')
 	dom.attr('#my-chart', 'width', 500)
 	dom.attr('#my-chart', 'height', 300)
 	return chart.draw('#my-chart', option)
 
-update = init()
+prep_ui()
+update = init_chart()
 
 def loop_fun( index ):
 	# shift(data, 1)
+	buy_value = int(dom.get('#i1', 'value'))
+	print buy_value
 	item = genData((data[len(data) - 1]['value'][1] * 12 + index * 600 + random.uniform(-index * 150, index * 150)) / 15)
 	data.append(item)
 	update({
@@ -165,18 +181,18 @@ def loop_fun( index ):
 			'type': 'line'
 		}]
 	})
-	if item['value'][1] > 1500:
+	if item['value'][1] >= buy_value:
 		ready_to_buy = True
-		def item_bought():
-			print 'item bought'
-		dom.set('#b1', 'innerHTML', 'Buy now')
-		dom.on('#b1', 'click', item_bought)
+		dom.attr('#b2', 'disabled', 'false')
 
 def start_sim ():
 	proc.loop(30, 1, loop_fun)
 
+def item_bought():
+	print 'item bought'
 
 dom.on('#b1', 'click', start_sim)
+dom.on('#b2', 'click', item_bought)
 
 	`
 			},
