@@ -19,7 +19,7 @@ const langTypes = {
 
 module.exports = ({state, actions}) => header([
 	img(`[src='assets/logo.jpg']`),
-	h1('codeBin'),
+	h1('Playground'),
 	label('Lang: '),
 	dropdown('#change-lang', langTypes, state.type, ev => actions.changeLanguage(ev.target.value)),
 	label('Examples: '),

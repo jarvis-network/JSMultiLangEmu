@@ -1,4 +1,4 @@
-# Jarvis codeBin
+# Jarvis Playground
 
 ## Prerequisites
 - Installed nodejs, preferably via nvm

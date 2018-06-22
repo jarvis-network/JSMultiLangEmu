@@ -138,8 +138,6 @@ option = {
 	}]
 }
 
-ready_to_buy = False
-
 def prep_ui():
 	dom.clear('#ui')
 	# price value
@@ -147,15 +145,11 @@ def prep_ui():
 	dom.set('#l1', 'innerHTML', 'Buy price:')
 	dom.create('input', 'i1', '#ui')
 	dom.attr('#i1', 'type', 'number')
-	dom.set('#i1', 'value', 1500)
+	dom.attr('#i1', 'style', 'width: 100px')
+	dom.set('#i1', 'value', 1200)
 	# start sim
 	dom.create('button', 'b1', '#ui')
-	dom.set('#b1', 'innerHTML', 'Start simulation')
-	# buy now
-	dom.create('button', 'b2', '#ui')
-	dom.set('#b2', 'innerHTML', 'Buy now')
-	# dom.attr('style', 'display: none')
-	dom.attr('#b2', 'disabled', 'true')
+	dom.set('#b1', 'innerHTML', 'Start')
 	# line break
 	dom.create('br', 'br1', '#ui')
 
@@ -169,11 +163,33 @@ def init_chart():
 prep_ui()
 update = init_chart()
 
+ready_to_buy = False
+
 def loop_fun( index ):
-	# shift(data, 1)
+	global ready_to_buy
+	if ready_to_buy == True:
+		return False
+	# get buy value
 	buy_value = int(dom.get('#i1', 'value'))
-	print buy_value
+	# generate data item
 	item = genData((data[len(data) - 1]['value'][1] * 12 + index * 600 + random.uniform(-index * 150, index * 150)) / 15)
+	if item['value'][1] >= buy_value:
+		ready_to_buy = True
+		item['label'] = {
+	    'normal': {
+				'show': True,
+				'cursor': 'pointer',
+	      'formatter': 'Buy now',
+	      'borderRadius': 4,
+	      'backgroundColor': '#333',
+	      'align': 'center',
+	      'color': '#eee',
+	      'padding': 10
+	    },
+      'emphasis': {
+        'padding': 12
+      }
+	  }
 	data.append(item)
 	update({
 		'series': [{
@@ -181,9 +197,6 @@ def loop_fun( index ):
 			'type': 'line'
 		}]
 	})
-	if item['value'][1] >= buy_value:
-		ready_to_buy = True
-		dom.attr('#b2', 'disabled', 'false')
 
 def start_sim ():
 	proc.loop(30, 1, loop_fun)
@@ -192,7 +205,6 @@ def item_bought():
 	print 'item bought'
 
 dom.on('#b1', 'click', start_sim)
-dom.on('#b2', 'click', item_bought)
 
 	`
 			},
