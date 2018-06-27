@@ -39,6 +39,8 @@ const build = (Sk, name, lib) => {
 		{
 			var mod = {};
 
+			const body = document.querySelector('.output > iframe').contentWindow.document;
+
 			const prepFunc = ${prepFunc.toString()}
 
 			Sk.${name} = {};

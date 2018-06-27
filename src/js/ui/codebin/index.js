@@ -22,9 +22,6 @@ let Sk = require('skulpt');
 // skulpt experiment
 
 console.log(Sk.builtinFiles);
-
-pyMod
-
 // Object.keys(skulptExtensions)
 // 	.forEach(ext => {
 // 		const pyExt = str.fromCamelCase(ext, '_');
@@ -140,14 +137,19 @@ const process = (type, sourceCode, iframe) => {
 			}</p>`);
 		}
 		// let ts = transformSync(jsSourceCode);
+		let className = jsSourceCode.match(/class ([a-zA-Z0-9_]+) \{/i);
+		console.log(jsSourceCode, className);
+		className = className && className[1];
 		// console.log(ts);
-		jsSourceCode += '\ntypeof HelloWorldExample !== "undefined" && HelloWorldExample.main && HelloWorldExample.main(1);';
+		if (className)
+			jsSourceCode += `\ntypeof ${className} !== "undefined" && ${className}.main && ${className}.main(1);`;
 		sandbox(jsSourceCode, iframe, {
 			System: {
 				out: {
 					println: (...args) => console$.onNext(`${args}\n`)
 				}
-			}
+			},
+			Jarvis: libs
 		}, ({res, log, err}) => {
 			if (err) console$.onNext(`<p class="err">${err}</p>\n`);
 			if (log) log.map(l => prettify.prettyPrintOne(JSON.stringify(l)))

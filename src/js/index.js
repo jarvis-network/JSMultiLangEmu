@@ -3,6 +3,7 @@
 // lib
 const Rx = require('rx');
 const $ = Rx.Observable;
+const request = require('superagent');
 
 // iblokz
 const vdom = require('iblokz-snabbdom-helpers');
@@ -44,6 +45,11 @@ actions$
 	.scan((state, change) => change(state), {})
 	.map(state => (console.log(state), state))
 	.subscribe(state => state$.onNext(state));
+
+// hooks
+request('data/examples.json')
+	.then(res => res.body)
+	.then(examples => actions.set('examples', examples));
 
 // state -> ui
 const ui$ = state$.map(state => ui({state, actions}));

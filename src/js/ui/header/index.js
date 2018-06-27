@@ -24,7 +24,7 @@ module.exports = ({state, actions}) => header([
 	dropdown('#change-lang', langTypes, state.type, ev => actions.changeLanguage(ev.target.value)),
 	label('Examples: '),
 	dropdown('#load-example',
-		Object.assign({'': 'Load ...'}, obj.map(state.examples[state.type], (k, v) => v.title)), '',
+		Object.assign({'': 'Load ...'}, obj.map(state.examples[state.type], (k, v) => k)), '',
 		ev => {
 			actions.loadExample(ev.target.value);
 			ev.target.value = '';
