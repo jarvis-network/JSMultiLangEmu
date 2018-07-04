@@ -10,7 +10,9 @@ const get = (url, callback) =>
 		.then(res => (
 			console.log({res}),
 			// callback.tp$call([Sk.ffi.remapToPy(res)])
-			callback(res)
+			(callback instanceof Function)
+				? callback(res)
+				: callback.callback ? callback.callback(res) : {}
 		));
 
 module.exports = {

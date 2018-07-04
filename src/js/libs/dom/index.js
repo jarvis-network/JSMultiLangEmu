@@ -44,15 +44,23 @@ const attr = (elQuery, attr, value) => {
 const on = (elQuery, evName, callback) => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
 	const el = body.querySelector(elQuery);
-	el.addEventListener(evName, ev => callback());
-	console.log(callback);
+	el.addEventListener(evName, ev => (
+		(callback instanceof Function)
+			? callback()
+			: callback.callback ? callback.callback() : {}
+	));
+	// console.log(callback);
 };
 
 const off = (elQuery, evName, callback) => {
 	const body = document.querySelector('.output > iframe').contentWindow.document;
 	const el = body.querySelector(elQuery);
-	el.removeEventListener(evName, ev => callback());
-	console.log(callback);
+	el.removeEventListener(evName, ev => (
+		(callback instanceof Function)
+			? callback()
+			: callback.callback ? callback.callback() : {}
+	));
+	// console.log(callback);
 };
 
 module.exports = {
