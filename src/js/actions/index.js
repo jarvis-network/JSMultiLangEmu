@@ -18,6 +18,7 @@ const initial = {
 	},
 	history: [
 		{
+			type: 'py',
 			source: 'print "Hello World!"',
 			pos: {
 				start: {row: 0, col: 0},
@@ -55,6 +56,7 @@ const loadExample = example => state => Object.assign({}, state, {
 	history: [].concat(
 		state.history.slice(0, state.index + 1),
 		[{
+			type: state.type,
 			source: state.examples[state.type][example],
 			pos: initial.pos
 		}]
@@ -68,7 +70,15 @@ const updateSource = (source, pos = initial.pos) => state => Object.assign({}, s
 	pos,
 	history: [].concat(
 		state.history.slice(0, state.index + 1),
-		[{source, pos}]
+		[{type: state.type, source, pos}]
+	)
+});
+
+const updatePos = pos => state => Object.assign({}, state, {
+	pos,
+	history: [].concat(
+		state.history.slice(0, state.history.length - 1),
+		[obj.patch(state.history[state.history.length - 1], 'pos', pos)]
 	)
 });
 
@@ -88,6 +98,7 @@ module.exports = {
 	changeLanguage,
 	loadExample,
 	updateSource,
+	updatePos,
 	undo,
 	redo
 };

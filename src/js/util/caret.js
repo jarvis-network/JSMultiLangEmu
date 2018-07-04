@@ -47,6 +47,7 @@ const get = el => {
 const set = (el, pos) => {
 	const startLi = Array.from(el.querySelectorAll('li'))[pos.start.row];
 	const endLi = Array.from(el.querySelectorAll('li'))[pos.end.row];
+	if (!startLi) return;
 	const startRp = getRangePoint(startLi, pos.start.col);
 	const endRp = getRangePoint(endLi, pos.end.col);
 	// console.log(rp);

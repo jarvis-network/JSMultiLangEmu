@@ -17,6 +17,7 @@ module.exports = ({state, actions}) => section('#ui', [
 		pos: state.pos,
 		type: state.type || 'js',
 		change: (source, pos) => actions.updateSource(source, pos),
+		updatePos: pos => actions.updatePos(pos),
 		undo: () => actions.undo(),
 		redo: () => actions.redo()
 	})

@@ -183,7 +183,8 @@ const process = (type, sourceCode, iframe) => {
 // ui
 module.exports = ({
 	source, pos, type,
-	change = code => code,
+	change = code => {},
+	updatePos = pos => {},
 	undo = () => {},
 	redo = () => {}
 }) => span('.codebin', [
