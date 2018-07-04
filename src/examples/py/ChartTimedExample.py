@@ -23,7 +23,7 @@ def genData(max = 2000):
 	return res
 
 #data = map(prepData, [820, 932, 901, 934, 1290, 1330, 1320])
-data = [genData(300)]
+data = []
 
 option = {
 	'xAxis': {
@@ -75,7 +75,10 @@ def loop_fun( index ):
 	# get buy value
 	buy_value = int(dom.get('#i1', 'value'))
 	# generate data item
-	item = genData((data[len(data) - 1]['value'][1] * 12 + index * 600 + random.uniform(-index * 150, index * 150)) / 15)
+	if len(data) == 0:
+		item = genData(300)
+	else:
+		item = genData((data[len(data) - 1]['value'][1] * 12 + index * 600 + random.uniform(-index * 150, index * 150)) / 15)
 	if item['value'][1] >= buy_value:
 		ready_to_buy = True
 		item['label'] = {

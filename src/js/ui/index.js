@@ -14,6 +14,10 @@ module.exports = ({state, actions}) => section('#ui', [
 	header({state, actions}),
 	codebin({
 		source: state.source || '',
+		pos: state.pos,
 		type: state.type || 'js',
-		change: source => actions.set('source', source)})
+		change: (source, pos) => actions.updateSource(source, pos),
+		undo: () => actions.undo(),
+		redo: () => actions.redo()
+	})
 ]);

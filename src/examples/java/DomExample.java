@@ -1,3 +1,12 @@
+interface CallBack {                   //declare an interface with the callback methods, so you can use on more than one class and just refer to the interface
+  void methodToCallBack();
+}
+
+class CallBackImpl implements CallBack {          //class that implements the method to callback defined in the interface
+  public void callback() {
+    System.out.println("Clicked");
+  }
+}
 
 public class DomExample {
 	// public static void callback(String args[]){
@@ -13,6 +22,7 @@ public class DomExample {
 		// button
 		Jarvis.dom.create("button", "b1", "#ui");
 		Jarvis.dom.set("#b1", "innerHTML", "click me");
-		// Jarvis.dom.on("#b1", "click", DomExample.callback)
+		CallBack callBack = new CallBackImpl();
+		Jarvis.dom.on("#b1", "click", callBack);
 	}
 }

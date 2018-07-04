@@ -9,7 +9,22 @@ const {obj, arr} = require('iblokz-data');
 const initial = {
 	type: 'py',
 	example: false,
+	index: 0,
+	maxIndex: 0,
 	source: 'print "Hello World!"',
+	pos: {
+		start: {row: 0, col: 0},
+		end: {row: 0, col: 0}
+	},
+	history: [
+		{
+			source: 'print "Hello World!"',
+			pos: {
+				start: {row: 0, col: 0},
+				end: {row: 0, col: 0}
+			}
+		}
+	],
 	examples: {
 		js: {},
 		py: {},
@@ -33,10 +48,37 @@ const changeLanguage = type => state => Object.assign({}, state, {
 
 const loadExample = example => state => Object.assign({}, state, {
 	example,
-	source: state.examples[state.type][example]
+	source: state.examples[state.type][example],
+	index: state.index + 1,
+	maxIndex: state.index + 1,
+	pos: initial.pos,
+	history: [].concat(
+		state.history.slice(0, state.index + 1),
+		[{
+			source: state.examples[state.type][example],
+			pos: initial.pos
+		}]
+	)
 });
 
-const updateSource = source => state => obj.patch(state, 'source', source);
+const updateSource = (source, pos = initial.pos) => state => Object.assign({}, state, {
+	source,
+	index: state.index + 1,
+	maxIndex: state.index + 1,
+	pos,
+	history: [].concat(
+		state.history.slice(0, state.index + 1),
+		[{source, pos}]
+	)
+});
+
+const undo = () => state => Object.assign({}, state, {
+	index: state.index > 0 ? state.index - 1 : 0
+}, state.history[state.index > 0 ? state.index - 1 : 0]);
+
+const redo = () => state => Object.assign({}, state, {
+	index: state.index < state.maxIndex ? state.index + 1 : state.index
+}, state.history[state.index < state.maxIndex ? state.index + 1 : state.index]);
 
 module.exports = {
 	initial,
@@ -45,5 +87,7 @@ module.exports = {
 	arrToggle,
 	changeLanguage,
 	loadExample,
-	updateSource
+	updateSource,
+	undo,
+	redo
 };

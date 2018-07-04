@@ -137,7 +137,7 @@ const process = (type, sourceCode, iframe) => {
 			}</p>`);
 		}
 		// let ts = transformSync(jsSourceCode);
-		let className = jsSourceCode.match(/class ([a-zA-Z0-9_]+) \{/i);
+		let className = sourceCode.match(/public class ([a-zA-Z0-9_]+) \{/i);
 		console.log(jsSourceCode, className);
 		className = className && className[1];
 		// console.log(ts);
@@ -181,8 +181,17 @@ const process = (type, sourceCode, iframe) => {
 };
 
 // ui
-module.exports = ({source, type}) => span('.codebin', [
+module.exports = ({
+	source, pos, type,
+	change = code => code,
+	undo = () => {},
+	redo = () => {}
+}) => span('.codebin', [
 	code(`.source[type="${type}"][contenteditable="true"][spellcheck="false"]`, {
+		hook: {
+			insert: ({elm}) => caret.set(elm, pos),
+			update: ({elm}) => caret.set(elm, pos)
+		},
 		props: {
 			innerHTML: prettify.prettyPrintOne(source, type, true),
 			spellcheck: false
@@ -195,6 +204,10 @@ module.exports = ({source, type}) => span('.codebin', [
 					ev.target.dispatchEvent(new Event('input'));
 					// document.execCommand('insertHTML', false, '&#009');
 					// document.execCommand('indent');
+				} else if (ev.key === 'z' && ev.ctrlKey) {
+					undo();
+				} else if (ev.key === 'y' && ev.ctrlKey) {
+					redo();
 				}
 			},
 			focus: ({target}) => [$.fromEvent(target, 'input')
@@ -210,8 +223,13 @@ module.exports = ({source, type}) => span('.codebin', [
 						return 1;
 					}),
 					inputs$.debounce(500).map(el => {
-						const sourceCode = cleanupCode(unprettify(el.innerHTML));
-
+						const pos = caret.get(el);
+						console.log(pos);
+						let sourceCode = unprettify(el.innerHTML);
+						change(sourceCode, pos);
+						// setTimeout(() => caret.set(el, pos));
+						/*
+						sourceCode = cleanupCode(sourceCode);
 						// clear and prep output and console
 						let iframe = prepOutput(el.parentNode.querySelector('.output'));
 
@@ -222,6 +240,7 @@ module.exports = ({source, type}) => span('.codebin', [
 								console.log(l);
 								el.parentNode.querySelector('.console').innerHTML += l;
 							});
+						*/
 
 						return 1;
 					})
